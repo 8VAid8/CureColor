@@ -12,6 +12,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
 
     TextView textInfo;
     Button btn_game;
+    String game_type, color;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,7 +23,10 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         btn_game.setOnClickListener(this);
 
         Bundle bundle = getIntent().getExtras();
-        textInfo.setText(bundle.getString("info"));
+        game_type = bundle.getString("type");
+        color = bundle.getString("color");
+
+        textInfo.setText(game_type);
     }
 
     @Override
@@ -31,7 +35,8 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.btnGame:
                 intent = new Intent(this, GameActivity.class);
-                intent.putExtra("type","sleep_plus");
+                intent.putExtra("type",game_type);
+                intent.putExtra("color", color);
                 startActivity(intent);
                 break;
             default:

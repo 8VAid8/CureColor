@@ -7,7 +7,7 @@ import android.graphics.Color;
  * Created by Alexey on 4/23/16.
  */
 public class ColorConverter {
-    public static String[][] ToColorsMatrix(int[][] matrix, String color)
+    public static Integer[][] ToColorsMatrix(int[][] matrix, String color)
     {
         int clr = Color.parseColor(color);
         int parts = matrix.length * matrix[0].length;
@@ -20,7 +20,7 @@ public class ColorConverter {
         int d_green = (255 - curr_green) / parts;
         int d_blue = (255 - curr_blue) / parts;
 
-        String[][] colors_matrix = new String[matrix.length][matrix[0].length];
+        Integer[][] colors_matrix = new Integer[matrix.length][matrix[0].length];
 
         for(int i = 0; i < matrix.length; i++)
         {
@@ -30,7 +30,7 @@ public class ColorConverter {
                 curr_green += d_green;
                 curr_blue += d_blue;
 
-                colors_matrix[i][j] = String.format("#%06X", (0xFFFFFF & Color.rgb(curr_red, curr_green, curr_blue)));
+                colors_matrix[i][j] = Color.rgb(curr_red, curr_green, curr_blue);
             }
         }
 
