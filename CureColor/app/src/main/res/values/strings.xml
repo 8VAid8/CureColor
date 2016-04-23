@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">CureColor</string>
+    <string name="title_activity_info" />
+    <string name="title_activity_game" />
+</resources>
