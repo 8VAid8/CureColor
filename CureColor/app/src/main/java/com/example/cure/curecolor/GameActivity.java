@@ -79,7 +79,7 @@ public class GameActivity extends Activity {
         gm.RandomMatrix();
 
         //заполнение GridView цветами в соответствии с gm.matrix
-        Integer colors[][] = ColorConverter.ToColorsMatrix(gm.matrix,color);
+        Integer colors[] = ColorConverter.ToColorsMatrix(gm.matrix,color);
 
 
        // ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
@@ -91,14 +91,12 @@ public class GameActivity extends Activity {
         int screenWidth = displaymetrics.widthPixels;
         int screenHeight = displaymetrics.heightPixels;
 
-        Integer fig_width = screenWidth / colors[0].length;
-        Integer fig_height = screenHeight / colors.length;
+        Integer fig_width = screenWidth / gm.matrix[0].length;
+        Integer fig_height = screenHeight / gm.matrix.length;
 
         grid_view.setNumColumns(gm.columns);
-        grid_view.setColumnWidth(fig_width);
-        grid_view.setStretchMode(GridView.STRETCH_SPACING_UNIFORM);
 
-        grid_view.setAdapter(new ImageAdapter(this, colors, screenWidth, screenHeight));
+        grid_view.setAdapter(new ImageAdapter(this, colors, gm.matrix, screenWidth, screenHeight));
 
 
     }

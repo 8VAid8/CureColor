@@ -19,21 +19,21 @@ public class ImageAdapter extends BaseAdapter {
     Integer fig_width;
     Integer fig_height;
 
-    public ImageAdapter(Context c, Integer[][] fill_colors, Integer width, Integer height) {
+    public ImageAdapter(Context c, Integer[] fill_colors, int[][] coords, Integer width, Integer height) {
         mContext = c;
-        fig_width = width / fill_colors[0].length;
-        fig_height = height / fill_colors.length;
+        fig_width = width / coords[0].length;
+        fig_height = height / coords.length;
         int[] colors = new int[fig_width * fig_height];
 
         bitmaps = new Bitmap[fig_width * fig_height];
         int pos = 0;
 
 
-        for(int i = 0; i < fill_colors.length; i++)
+        for(int i = 0; i < coords.length; i++)
         {
-            for(int j = 0; j < fill_colors[0].length; j++)
+            for(int j = 0; j < coords[0].length; j++)
             {
-                Arrays.fill(colors, 0, fig_width * fig_height, fill_colors[i][j]);
+                Arrays.fill(colors, 0, fig_width * fig_height, fill_colors[coords[i][j]-1]);
                 bitmaps[pos] = Bitmap.createBitmap(colors, fig_width, fig_height, Bitmap.Config.RGB_565);
                 pos++;
                 colors = new int[fig_width * fig_height];
