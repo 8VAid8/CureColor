@@ -15,7 +15,7 @@ public class MatrixGame {
     public void RandomMatrix() {
         matrix = new int[rows][columns];
 
-        int plc = 1;
+        int plc = 0;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 matrix[i][j] = plc;

@@ -33,7 +33,7 @@ public class ImageAdapter extends BaseAdapter {
         {
             for(int j = 0; j < coords[0].length; j++)
             {
-                Arrays.fill(colors, 0, fig_width * fig_height, fill_colors[coords[i][j]-1]);
+                Arrays.fill(colors, 0, fig_width * fig_height, fill_colors[coords[i][j]]);
                 bitmaps[pos] = Bitmap.createBitmap(colors, fig_width, fig_height, Bitmap.Config.RGB_565);
                 pos++;
                 colors = new int[fig_width * fig_height];
