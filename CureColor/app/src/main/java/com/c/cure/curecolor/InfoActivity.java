@@ -1,4 +1,4 @@
-package com.example.cure.curecolor;
+package com.c.cure.curecolor;
 
 
 import android.content.Intent;
@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.example.cure.curecolor.R;
 
 public class InfoActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -26,7 +28,23 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         game_type = bundle.getString("type");
         color = bundle.getString("color");
 
-        textInfo.setText(game_type);
+        switch (game_type)
+        {
+            case "bSleepPlus":
+                textInfo.setText(R.string.sleep_plus);
+                break;
+            case "bSleepMinus":
+                textInfo.setText(R.string.sleep_minus);
+                break;
+            case "bAppetitePlus":
+                textInfo.setText(R.string.appetite_plus);
+                break;
+            case "bAppetiteMinus":
+                textInfo.setText(R.string.appetite_minus);
+                break;
+            default:break;
+        }
+
     }
 
     @Override

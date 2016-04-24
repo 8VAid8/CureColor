@@ -1,4 +1,4 @@
-package com.example.cure.curecolor;
+package com.c.cure.curecolor;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

@@ -1,4 +1,4 @@
-package com.example.cure.curecolor;
+package com.c.cure.curecolor;
 
 import java.util.Random;
 
@@ -46,15 +46,18 @@ public class MatrixGame {
      */
     public boolean CheckWin()
     {
+        int buf = matrix[0][0];
      for(int i = 0; i < rows; i++)
      {
-         for(int j = 0; j < columns; i++)
+         for(int j = 0; j < columns; j++)
          {
-            if(matrix[i][j] > matrix[i+1][j+1]) return false;
+             if(i == 0 && j == 0) continue;
+             if(buf < matrix[i][j]) return false;
+             buf = matrix[i][j];
          }
      }
-        rows *=2;
-        columns *=2;
+        rows +=1;
+        columns +=1;
         return true;
     }
 

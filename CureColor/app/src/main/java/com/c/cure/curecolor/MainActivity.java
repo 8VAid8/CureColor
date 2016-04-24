@@ -1,4 +1,4 @@
-package com.example.cure.curecolor;
+package com.c.cure.curecolor;
 
 
 import android.content.Intent;
@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
+import com.example.cure.curecolor.R;
 
 import java.util.Random;
 

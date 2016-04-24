@@ -3,4 +3,14 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="SleepPlus_clr1">#00fa9a</color>
+    <color name="SleepPlus_clr2">#43cd80</color>
+    <color name="SleepPlus_clr3">#ffaeb9</color>
+
+    <color name="SleepMinus_clr1">#ff3030</color>
+
+    <color name="AppetitePlus_clr1">#ffa500</color>
+
+    <color name="AppetiteMinus_clr1">#8b00ff</color>*/
 </resources>

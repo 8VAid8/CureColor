@@ -1,4 +1,4 @@
-package com.example.cure.curecolor;
+package com.c.cure.curecolor;
 
 import android.content.Context;
 import android.content.Intent;

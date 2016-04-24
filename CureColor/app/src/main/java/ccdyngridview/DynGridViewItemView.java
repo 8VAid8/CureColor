@@ -62,7 +62,7 @@ class DynGridViewItemView extends RelativeLayout implements DragSource, DropTarg
 		//info for logo
 		ImageView ivLogo;
 		ivLogo = new ImageView(context);
-		ivLogo.setId(100);
+		//ivLogo.setId(100);
 		RelativeLayout.LayoutParams lp_logo = new RelativeLayout.LayoutParams(
 				mitem.getWidth() - 2*mitem.getPadding(), LayoutParams.WRAP_CONTENT);
 		lp_logo.addRule(RelativeLayout.ALIGN_PARENT_TOP);

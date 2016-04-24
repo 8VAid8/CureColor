@@ -1,4 +1,4 @@
-package com.example.cure.curecolor;
+package com.c.cure.curecolor;
 
 
 import java.util.ArrayList;
@@ -11,38 +11,22 @@ import ccdyngridview.DynGridViewAdapter;
 import ccdyngridview.DynGridViewItemData;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.Typeface;
-import android.graphics.drawable.LevelListDrawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Menu;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-        import java.util.ArrayList;
 import java.util.Arrays;
 
-import ccdyngridview.DeleteZone;
-        import ccdyngridview.DragController;
-        import ccdyngridview.DynGridView;
-        import ccdyngridview.DynGridViewAdapter;
-        import ccdyngridview.DynGridViewItemData;
+import com.example.cure.curecolor.R;
 
 public class GameActivity extends Activity implements DynGridViewListener, View.OnClickListener {
     Paint p;
@@ -58,6 +42,8 @@ public class GameActivity extends Activity implements DynGridViewListener, View.
     Bitmap[] bitmaps;
     Integer fig_width;
     Integer fig_height;
+    int screenWidth;
+    int screenHeight;
 
 
     final static int		idTopLayout = Menu.FIRST + 100,
@@ -96,8 +82,8 @@ public class GameActivity extends Activity implements DynGridViewListener, View.
 
         DisplayMetrics displaymetrics = new DisplayMetrics();
         this.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int screenWidth = displaymetrics.widthPixels;
-        int screenHeight = displaymetrics.heightPixels;
+        screenWidth = displaymetrics.widthPixels;
+        screenHeight = displaymetrics.heightPixels;
 
         CreateBitmaps(colors, gm.matrix, screenWidth, screenHeight);
 
@@ -196,9 +182,54 @@ public class GameActivity extends Activity implements DynGridViewListener, View.
 
     public void onItemsChanged(int positionOne, int positionTwo) {
         String text = "You've changed item " + positionOne + " with item "+ positionTwo;
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+      //  Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
 
-        //swap(int i1, int j1, int i2, int j2)
+        int[][] buf = new int[gm.matrix.length][gm.matrix[0].length];
+
+        int m_length = gm.matrix.length * gm.matrix[0].length;
+        int col_cnt = gm.columns;
+
+        int i1 = 0;
+        int j1 = 0;
+
+        int i0 = 0;
+        for(int i = 0; i < positionOne; i++)
+        {
+            i0++;
+            if(i0 < col_cnt)
+            j1++;
+            else
+            {
+                i0 = 0;
+                j1 = 0;
+                i1++;
+            }
+        }
+
+        int i2 = 0;
+        int j2 = 0;
+        i0 = 0;
+        for(int i = 0; i < positionTwo; i++)
+        {
+            i0++;
+            if(i0 < col_cnt)
+                j2++;
+            else
+            {
+                j2 = 0;
+                i0 = 0;
+                i2++;
+            }
+        }
+      //  Toast.makeText(this, "i1" + String.valueOf(i1), Toast.LENGTH_SHORT).show();
+
+        gm.swap(i1, j1, i2, j2);
+        if(gm.CheckWin())
+        {
+           // Toast.makeText(this, "WIIIIIIIIIIIN!!!11", Toast.LENGTH_SHORT).show();
+            NewLevel();
+        }
+
     }
 
     public void onItemDeleted(int position, int id) {
@@ -208,26 +239,75 @@ public class GameActivity extends Activity implements DynGridViewListener, View.
     }
 
     public void onSwipeLeft() {
-        String text = "Swipe LEFT detected";
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+     /*   String text = "Swipe LEFT detected";
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();*/
     }
 
     public void onSwipeRight() {
-        String text = "Swipe RIGHT detected";
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+        /*String text = "Swipe RIGHT detected";
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();*/
     }
 
     public void onSwipeUp() {
-        String text = "Swipe UP detected";
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+        /*String text = "Swipe UP detected";
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();*/
     }
 
     public void onSwipeDown() {
-        String text = "Swipe DOWN detected";
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+      /*  String text = "Swipe DOWN detected";
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();*/
     }
 
+    void NewLevel()
+    {
+        gm.RandomMatrix();
+        //заполнение GridView цветами в соответствии с gm.matrix
+        Integer colors[] = ColorConverter.ToColorsMatrix(gm.matrix,color);
+        CreateBitmaps(colors, gm.matrix, screenWidth, screenHeight);
 
+
+        //2. setup gridview data
+        itemList = new ArrayList<DynGridViewItemData>();
+        for (int i=0;i<bitmaps.length;i++) {
+            DynGridViewItemData item = new DynGridViewItemData(
+                    null, // item string name
+                    fig_width, fig_height, 0, // sizes: item w, item h, item padding
+                    bitmaps[i], // item background image
+                    bitmaps[i],
+                    bitmaps[i],
+                    false, // favorite state, if favs are enabled
+                    mToggleFavs, // favs disabled
+                    bitmaps[i], // item image
+                    i  // item id
+            );
+
+            //DynGridViewItemData item = new DynGridViewItemData("Item:"+i,
+            //	R.drawable.itemback, R.drawable.itemimg,i);
+            itemList.add(item);
+        }
+
+        //3. create adapter
+        m_gridviewAdapter = new DynGridViewAdapter(this, itemList);
+
+        //4. add adapter to gridview
+        gv.setAdapter(m_gridviewAdapter);
+        //gv.setColumnWidth(300);
+        gv.setNumColumns(gm.columns);
+        //gv.setSelection(2);
+        gv.setDynGridViewListener((DynGridView.DynGridViewListener) this);
+
+
+
+
+        // drag functionality
+        gv.setDeleteView(mDeleteZone);
+        DragController dragController = new DragController(this);
+
+        gv.setDragController(dragController);
+
+        // gv.getDragController().setDragEnabled(false); // disable DRAG functionality
+        gv.setSwipeEnabled(mToggleScroll); // enable swipe but disable scrolling
+    }
 
     public void CreateBitmaps( Integer[] fill_colors, int[][] coords, Integer width, Integer height) {
 
