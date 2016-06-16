@@ -1,183 +1,159 @@
 package com.c.cure.curecolor;
 
-
-import java.util.ArrayList;
-
-import ccdyngridview.DeleteZone;
-import ccdyngridview.DragController;
-import ccdyngridview.DynGridView;
-import ccdyngridview.DynGridView.DynGridViewListener;
-import ccdyngridview.DynGridViewAdapter;
-import ccdyngridview.DynGridViewItemData;
-
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.DragEvent;
 import android.view.Menu;
+import android.view.MotionEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AbsoluteLayout;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.Arrays;
 
 import com.example.cure.curecolor.R;
 
-public class GameActivity extends Activity implements DynGridViewListener, View.OnClickListener {
-    Paint p;
-    Rect rect;
-    TextView drag;
-    Canvas canvas;
+public class GameActivity extends Activity  implements View.OnTouchListener, View.OnDragListener  {
 
     MatrixGame gm;
-    ArrayAdapter<String> adapter;
-    TextView text;
     String color, game_type;
-    Bitmap bitmap;
     Bitmap[] bitmaps;
     Integer fig_width;
     Integer fig_height;
     int screenWidth;
     int screenHeight;
 
+    RelativeLayout mainLayout;
+    ImageView dragging;
+    float startX, startY;
 
-    final static int		idTopLayout = Menu.FIRST + 100,
-            idBack 		= Menu.FIRST + 101,
-            idBotLayout	= Menu.FIRST + 102,
-            idToggleScroll=Menu.FIRST+ 103,
-            idToggleFavs = Menu.FIRST+ 104;
-
-    DynGridViewAdapter	 	m_gridviewAdapter		= null;
-    DeleteZone 				mDeleteZone				= null;
-    ArrayList<DynGridViewItemData> itemList			= null;
-    DynGridView 			gv						= null;
-    boolean					mToggleScroll			= true,
-            mToggleFavs				= false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         setContentView(R.layout.activity_game);
 
-        gv = (DynGridView)findViewById(R.id.gridView);
+        mainLayout = (RelativeLayout) findViewById(R.id.game);
+        mainLayout.setOnDragListener(this);
 
-
+        //provide data from previous activitys
         Bundle bundle = getIntent().getExtras();
         game_type = bundle.getString("type");
         color = bundle.getString("color");
-
+        //game info preparation
         gm = new MatrixGame();
         gm.RandomMatrix();
 
-        //заполнение GridView цветами в соответствии с gm.matrix
         Integer colors[] = ColorConverter.ToColorsMatrix(gm.matrix,color);
-
         DisplayMetrics displaymetrics = new DisplayMetrics();
         this.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         screenWidth = displaymetrics.widthPixels;
         screenHeight = displaymetrics.heightPixels;
-
         CreateBitmaps(colors, gm.matrix, screenWidth, screenHeight);
 
-        //---------
-        //1. create gridview view
+        for (int i = 0; i < bitmaps.length; i++)
+        {
+            ImageView image = new ImageView(this);
+            image.setImageBitmap(bitmaps[i]);
+            image.setOnTouchListener(this);
 
-
-        //2. setup gridview data
-        itemList = new ArrayList<DynGridViewItemData>();
-        for (int i=0;i<bitmaps.length;i++) {
-            DynGridViewItemData item = new DynGridViewItemData(
-                    null, // item string name
-                    fig_width, fig_height, 0, // sizes: item w, item h, item padding
-                    bitmaps[i], // item background image
-                    bitmaps[i],
-                    bitmaps[i],
-                    false, // favorite state, if favs are enabled
-                    mToggleFavs, // favs disabled
-                    bitmaps[i], // item image
-                    i  // item id
-            );
-
-            //DynGridViewItemData item = new DynGridViewItemData("Item:"+i,
-            //	R.drawable.itemback, R.drawable.itemimg,i);
-            itemList.add(item);
-        }
-
-        //3. create adapter
-        m_gridviewAdapter = new DynGridViewAdapter(this, itemList);
-
-        //4. add adapter to gridview
-        gv.setAdapter(m_gridviewAdapter);
-        //gv.setColumnWidth(300);
-        gv.setNumColumns(gm.columns);
-        //gv.setSelection(2);
-        gv.setDynGridViewListener((DynGridView.DynGridViewListener) this);
-
-
-
-
-        // drag functionality
-        gv.setDeleteView(mDeleteZone);
-        DragController dragController = new DragController(this);
-
-        gv.setDragController(dragController);
-
-        // gv.getDragController().setDragEnabled(false); // disable DRAG functionality
-        gv.setSwipeEnabled(mToggleScroll); // enable swipe but disable scrolling
-
-    }
-
-    public void onClick(View arg0) {
-        // TODO Auto-generated method stub
-        int id = arg0.getId();
-        // If cancel is pressed, close our app
-        if (id == idBack) finish();
-        if (id == idToggleScroll) {
-            mToggleScroll = !mToggleScroll;
-            gv.setSwipeEnabled(mToggleScroll);
-            String text = "Swipe enabled:"+mToggleScroll;
-            Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
-        }
-        if (id == idToggleFavs) {
-            mToggleFavs = !mToggleFavs;
-            for (DynGridViewItemData item:itemList)
-                item.setFavoriteStateShow(mToggleFavs);
-            m_gridviewAdapter.notifyDataSetChanged();
-            gv.invalidateViews();
-
-            String text = "Favs enabled:"+mToggleFavs;
-            Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+            Coords c = MasToMatrix(i, gm.matrix[0].length);
+            image.setX(fig_width * c.j);
+            image.setY(fig_height * c.i);
+            image.setTag(i);
+            mainLayout.addView(image);
         }
     }
 
-    public void onItemClick(View v, int position, int id) {
-      /*  String text = "Click on:"+id+ " " +
-                ((DynGridViewItemData)m_gridviewAdapter.getItem(position)).getLabel();
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();*/
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        int action = event.getAction();
+        if (action == MotionEvent.ACTION_DOWN) {
+            dragging = (ImageView) v;
+            ClipData data = ClipData.newPlainText("", "");
+            View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
+            dragging.startDrag(data, shadowBuilder, v, 0);
+            dragging.setVisibility(View.INVISIBLE);
+            startX = v.getX();
+            startY = v.getY();
+            return true;
+        }
+        return false;
     }
 
-    public void onItemFavClick(View v, int position, int id) {
-        itemList.get(position).setFavoriteState(!itemList.get(position).getFavoriteState());
-        m_gridviewAdapter.notifyDataSetChanged();
-        gv.invalidateViews();
+    @Override
+    public boolean onDrag(View v, DragEvent event) {
+        int action = event.getAction();
+        int x = (int)event.getX();
+        int y = (int)event.getY();
+        switch (action) {
+            case DragEvent.ACTION_DRAG_STARTED:
+                // do nothing
+                break;
+            case DragEvent.ACTION_DROP:
+                // Dropped, reassign View to ViewGroup
+                setAbsoluteLocation(dragging, startX, startY);
+                for (int i = 0; i< bitmaps.length; i++)
+                {
+                    Rect rect = new Rect();
+                    ImageView img = (ImageView)mainLayout.findViewWithTag(i);
+                    img.getHitRect(rect);
+                    if (rect.contains(x, y)) {
+                        setSameAbsoluteLocation(dragging, img);
+                        img.setX(startX);
+                        img.setY(startY);
+                        onItemsChanged((int)dragging.getTag(), (int)img.getTag());
+                        int tag0 = (int)dragging.getTag(), tag1 = (int)img.getTag();
+                        dragging.setTag(tag1);
+                        img.setTag(tag0);
+                        break;
+                    }
+                }
+                dragging.setVisibility(View.VISIBLE);
+                break;
+            case DragEvent.ACTION_DRAG_EXITED:
+          //  setAbsoluteLocationCentered(v, x, y);
+            break;
+            case DragEvent.ACTION_DRAG_ENDED:
+                //v.setBackgroundDrawable(normalShape);
 
-     /*   String text = "Item:"+position+ " fav state:" +
-                ((DynGridViewItemData)m_gridviewAdapter.getItem(position)).getFavoriteState();
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();*/
+            default:
+                break;
+        }
+        return true;
     }
 
-    public void onDragStart() {
+    private void setSameAbsoluteLocation(View v1, View v2) {
+        setAbsoluteLocation(v1, v2.getX(), v2.getY());
     }
 
-    public void onDragStop() {
+    private void setAbsoluteLocationCentered(View v, int x, int y) {
+        setAbsoluteLocation(v, x - v.getWidth() / 2, y - v.getHeight() / 2);
+    }
+
+    private void setAbsoluteLocation(View v, float x, float y) {
+        v.setX(x);
+        v.setY(y);
     }
 
     public void onItemsChanged(int positionOne, int positionTwo) {
@@ -232,81 +208,63 @@ public class GameActivity extends Activity implements DynGridViewListener, View.
 
     }
 
-    public void onItemDeleted(int position, int id) {
-        String text = "You've deleted item " + id + " " +
-                ((DynGridViewItemData)m_gridviewAdapter.getItem(position)).getLabel();
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
-    }
-
-    public void onSwipeLeft() {
-     /*   String text = "Swipe LEFT detected";
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();*/
-    }
-
-    public void onSwipeRight() {
-        /*String text = "Swipe RIGHT detected";
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();*/
-    }
-
-    public void onSwipeUp() {
-        /*String text = "Swipe UP detected";
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();*/
-    }
-
-    public void onSwipeDown() {
-      /*  String text = "Swipe DOWN detected";
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();*/
-    }
-
     void NewLevel()
     {
+        mainLayout.removeAllViews();
+        //game info preparation
         gm.RandomMatrix();
-        //заполнение GridView цветами в соответствии с gm.matrix
+
         Integer colors[] = ColorConverter.ToColorsMatrix(gm.matrix,color);
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        screenWidth = displaymetrics.widthPixels;
+        screenHeight = displaymetrics.heightPixels;
         CreateBitmaps(colors, gm.matrix, screenWidth, screenHeight);
 
+        for (int i = 0; i < bitmaps.length; i++)
+        {
+            ImageView image = new ImageView(this);
+            image.setImageBitmap(bitmaps[i]);
+            image.setOnTouchListener(this);
 
-        //2. setup gridview data
-        itemList = new ArrayList<DynGridViewItemData>();
-        for (int i=0;i<bitmaps.length;i++) {
-            DynGridViewItemData item = new DynGridViewItemData(
-                    null, // item string name
-                    fig_width, fig_height, 0, // sizes: item w, item h, item padding
-                    bitmaps[i], // item background image
-                    bitmaps[i],
-                    bitmaps[i],
-                    false, // favorite state, if favs are enabled
-                    mToggleFavs, // favs disabled
-                    bitmaps[i], // item image
-                    i  // item id
-            );
-
-            //DynGridViewItemData item = new DynGridViewItemData("Item:"+i,
-            //	R.drawable.itemback, R.drawable.itemimg,i);
-            itemList.add(item);
+            Coords c = MasToMatrix(i, gm.matrix[0].length);
+            image.setX(fig_width * c.j);
+            image.setY(fig_height * c.i);
+            image.setTag(i);
+            mainLayout.addView(image);
         }
-
-        //3. create adapter
-        m_gridviewAdapter = new DynGridViewAdapter(this, itemList);
-
-        //4. add adapter to gridview
-        gv.setAdapter(m_gridviewAdapter);
-        //gv.setColumnWidth(300);
-        gv.setNumColumns(gm.columns);
-        //gv.setSelection(2);
-        gv.setDynGridViewListener((DynGridView.DynGridViewListener) this);
+    }
 
 
+    Coords MasToMatrix(int position, int col_cnt)
+    {
+        int i1 = 0;
+        int j1 = 0;
 
+        int i0 = 0;
+        for(int i = 0; i < position; i++)
+        {
+            i0++;
+            if(i0 < col_cnt)
+                j1++;
+            else
+            {
+                i0 = 0;
+                j1 = 0;
+                i1++;
+            }
+        }
+        return new Coords(i1,j1);
+    }
 
-        // drag functionality
-        gv.setDeleteView(mDeleteZone);
-        DragController dragController = new DragController(this);
-
-        gv.setDragController(dragController);
-
-        // gv.getDragController().setDragEnabled(false); // disable DRAG functionality
-        gv.setSwipeEnabled(mToggleScroll); // enable swipe but disable scrolling
+    class Coords
+    {
+        public int i, j;
+        public Coords(int i, int j)
+        {
+            this.i = i;
+            this.j = j;
+        }
     }
 
     public void CreateBitmaps( Integer[] fill_colors, int[][] coords, Integer width, Integer height) {
@@ -315,7 +273,7 @@ public class GameActivity extends Activity implements DynGridViewListener, View.
         fig_height = height / coords.length;
         int[] colors = new int[fig_width * fig_height];
 
-        bitmaps = new Bitmap[fig_width * fig_height];
+        bitmaps = new Bitmap[coords.length * coords[0].length];
         int pos = 0;
 
 

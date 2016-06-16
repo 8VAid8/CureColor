@@ -2,6 +2,10 @@ package com.c.cure.curecolor;
 
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PaintDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -27,7 +31,9 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         Bundle bundle = getIntent().getExtras();
         game_type = bundle.getString("type");
         color = bundle.getString("color");
-
+        btn_game.setBackgroundColor(Color.parseColor(color));
+        Drawable background = btn_game.getBackground();
+        if(((ColorDrawable) background).getColor() == Color.parseColor("#000000")) btn_game.setTextColor(Color.LTGRAY);
         switch (game_type)
         {
             case "bSleepPlus":

@@ -21,9 +21,10 @@
         </activity>
         <activity
             android:name="com.c.cure.curecolor.GameActivity"
-            android:label="@string/title_activity_game" >
+            android:label="@string/title_activity_game"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation">
         </activity>
     </application>
-    <uses-permission
-        android:name="android.permission.VIBRATE"></uses-permission>
+
 </manifest>

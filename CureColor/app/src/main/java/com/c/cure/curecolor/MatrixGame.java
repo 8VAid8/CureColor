@@ -46,21 +46,47 @@ public class MatrixGame {
      */
     public boolean CheckWin()
     {
+        int cnt = rows * columns;
         int buf = matrix[0][0];
-     for(int i = 0; i < rows; i++)
-     {
-         for(int j = 0; j < columns; j++)
+        for(int i = 0; i < rows; i++)
          {
-             if(i == 0 && j == 0) continue;
-             if(buf < matrix[i][j]) return false;
-             buf = matrix[i][j];
+             for(int j = 0; j < columns; j++)
+             {
+                 if(i == 0 && j == 0) continue;
+                 if(buf < matrix[i][j]){ cnt--; }
+                 buf = matrix[i][j];
+             }
          }
-     }
-        rows +=1;
-        columns +=1;
-        return true;
+        if(cnt == rows * columns)
+        {
+            RwsClmnsPlus();
+            return true;
+        }
+        cnt = rows * columns;
+        buf = matrix[0][0];
+        //- check2
+        for(int i = 0; i < rows; i++)
+        {
+            for(int j = 0; j < columns; j++)
+            {
+                if(i == 0 && j == 0) continue;
+                if(buf > matrix[i][j]){ cnt--; }
+                buf = matrix[i][j];
+            }
+        }
+        if(cnt == rows * columns)
+        {
+            RwsClmnsPlus();
+            return true;
+        }
+        return  false;
     }
 
+    void RwsClmnsPlus()
+    {
+        rows +=1;
+        columns +=1;
+    }
     /** Shuffles a 2D array with the same number of columns for each row. */
     static void shuffle(int[][] matrix, int columns, Random rnd) {
         int size = matrix.length * columns;

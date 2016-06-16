@@ -27,6 +27,5 @@
         android:text="К игре"
         android:id="@+id/btnGame"
         android:layout_gravity="right"
-        android:layout_weight="0"
-        android:background="@color/AppetiteMinus_clr1" />
+        android:layout_weight="0" />
 </LinearLayout>
